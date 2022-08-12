@@ -1,4 +1,3 @@
-import fastify from 'fastify'
 import buildServer from './config/server'
 
 const startServer = async () => {
