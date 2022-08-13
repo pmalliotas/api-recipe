@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify"
-import { $ref, ILoginInput } from './users.schemas'
+import { $ref, ILoginInput } from './user.schemas'
 
 const userRoutes = async (server: FastifyInstance) => {
 
@@ -13,7 +13,8 @@ const userRoutes = async (server: FastifyInstance) => {
     }, async (req: FastifyRequest<{ Body: ILoginInput }>, reply) => {
         reply.status(201).send({
             ...req.body,
-            id: 1
+            id: 1,
+            message: req.t('user_created')
         })
     })
 

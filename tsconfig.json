@@ -13,7 +13,8 @@
 				"node_modules/*"
 			]
 		},
-		"resolveJsonModule": true
+		"resolveJsonModule": true,
+		"strict": true
 	},
 	"include": [
 		"src/**/*"

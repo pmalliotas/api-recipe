@@ -2,6 +2,8 @@ import { FastifyHelmetOptions } from "@fastify/helmet";
 import { fastifyEnvOpt } from "@fastify/env";
 import { RateLimitPluginOptions } from '@fastify/rate-limit'
 import { JWT } from "@fastify/jwt";
+import lng from '../../locales/el/translation.json'
+import { TFunction } from "i18next";
 
 declare module 'fastify' {
     interface FastifyInstance {
@@ -16,7 +18,9 @@ declare module 'fastify' {
 
     interface FastifyRequest {
         jwt: JWT;
+        t: (language_key: keyof typeof lng) => string & TFunction
     }
+
 
     export interface FastifyInstance {
         authenticate: any;
