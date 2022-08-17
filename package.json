@@ -1,6 +1,6 @@
 {
   "name": "api-recipe",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "main": "app.ts",
   "repository": "https://github.com/pmalliotas/api-recipe.git",
   "author": "Panos Malliotas",
@@ -22,6 +22,7 @@
     "i18next": "^21.9.0",
     "i18next-fs-backend": "^1.1.5",
     "i18next-http-middleware": "^3.2.1",
+    "knex": "^2.2.0",
     "pg": "^8.7.3",
     "zod": "^3.18.0"
   },

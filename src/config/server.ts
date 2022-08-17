@@ -10,6 +10,7 @@ import { withRefResolver } from 'fastify-zod'
 import i18next from 'i18next'
 import i18nextFsBackend from 'i18next-fs-backend'
 import i18nextMiddleware from 'i18next-http-middleware'
+import knex from 'knex'
 
 import { version } from '../../package.json'
 
@@ -45,8 +46,14 @@ const buildServer = async () => {
 
     await server.after()
 
+    const pg = knex({
+        client: 'pg',
+        connection: server.config.DB_CONNECTION_URL
+    })
+
     // server.register(fastifyRedis, { url: server.config.REDIS_CONNECTION_URL })
     // server.register(fastifyPostgres, { connectionString: server.config.DB_CONNECTION_URL })
+    server.decorate('knex', pg)
     server.register(fastifyJwt, { secret: server.config.JWT_SECRET })
 
     for (const schema of [...userSchemas]) {
@@ -61,7 +68,7 @@ const buildServer = async () => {
             staticCSP: true,
             openapi: {
                 info: {
-                    title: "Fastify API",
+                    title: "Recipe App API",
                     description: "API for Recipe APP",
                     version,
                 },

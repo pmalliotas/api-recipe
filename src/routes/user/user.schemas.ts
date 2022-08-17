@@ -80,7 +80,8 @@ const createUserSchema = z.object({
 const createUserResponseSchema = z.object({
   ...userCore,
   id: z.number(),
-  message: z.string()
+  message: z.string(),
+  // created_at: z.date()
 });
 
 const loginSchema = z.object({

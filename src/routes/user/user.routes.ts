@@ -10,10 +10,13 @@ const userRoutes = async (server: FastifyInstance) => {
                 201: $ref('createUserResponseSchema')
             }
         },
-    }, async (req: FastifyRequest<{ Body: ILoginInput }>, reply) => {
+    }, async (req: FastifyRequest<{ Body: ILoginInput, Querystring: { id: string } }>, reply) => {
+
+        const res = await server.knex('users').select('created_at', 'email', 'password', 'id').where('id', 1)
+        console.log(res[0])
+
         reply.status(201).send({
-            ...req.body,
-            id: 1,
+            ...res[0],
             message: req.t('user_created')
         })
     })
