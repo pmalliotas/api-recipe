@@ -3,7 +3,6 @@ import fastifyHelmet from '@fastify/helmet'
 import fastifyRateLimit from '@fastify/rate-limit'
 import fastifyJwt from '@fastify/jwt'
 import fastifyEnv from '@fastify/env'
-import fastifyPostgres from '@fastify/postgres'
 import fastifyRedis from '@fastify/redis'
 import fastifySwagger from '@fastify/swagger'
 import { withRefResolver } from 'fastify-zod'
@@ -52,7 +51,6 @@ const buildServer = async () => {
     })
 
     // server.register(fastifyRedis, { url: server.config.REDIS_CONNECTION_URL })
-    // server.register(fastifyPostgres, { connectionString: server.config.DB_CONNECTION_URL })
     server.decorate('knex', pg)
     server.register(fastifyJwt, { secret: server.config.JWT_SECRET })
 

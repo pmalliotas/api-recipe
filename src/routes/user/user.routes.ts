@@ -12,11 +12,14 @@ const userRoutes = async (server: FastifyInstance) => {
         },
     }, async (req: FastifyRequest<{ Body: ILoginInput, Querystring: { id: string } }>, reply) => {
 
-        const res = await server.knex('users').select('created_at', 'email', 'password', 'id').where('id', 1)
-        console.log(res[0])
+        const user = await server.knex('users').select('created_at', 'email', 'password', 'id').where('id', 1)
+        console.log(user[0])
+
+        const comments = await server.knex('comments').innerJoin('users', 'comments.user_id', '=', 'users.id')
+        console.log('🚀 ~ file: user.routes.ts ~ line 19 ~ userRoutes ~ comments', comments[0]);
 
         reply.status(201).send({
-            ...res[0],
+            ...user[0],
             message: req.t('user_created')
         })
     })

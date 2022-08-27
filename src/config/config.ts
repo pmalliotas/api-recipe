@@ -24,11 +24,6 @@ declare module 'fastify' {
         jwt: JWT;
         t: (key: keyof typeof lng) => string & TFunction
     }
-
-
-    export interface FastifyInstance {
-        authenticate: any;
-    }
 }
 
 declare module "@fastify/jwt" {
