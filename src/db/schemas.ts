@@ -56,8 +56,9 @@ declare module 'knex/types/tables' {
         description: string
         people: number
         time: number
-        cost: number
+        total_cost: number
         difficulty: number
+        tags: string[]
         created_at: string
         updated_at: string
     }
@@ -96,6 +97,24 @@ declare module 'knex/types/tables' {
         updated_at: string
     }
 
+    interface RecipeCompositions {
+        id: number
+        recipe_id: number
+        ingredient_id: number
+        ingredient_quantity: string
+        ingredient_quantity_type_id: number
+        created_at: string
+        updated_at: string
+    }
+
+    interface RecipeCategories {
+        id: number
+        recipe_id: number
+        category_id: number
+        created_at: string
+        updated_at: string
+    }
+
     interface Tables {
         users: User
         favorites: Favorite
@@ -107,6 +126,8 @@ declare module 'knex/types/tables' {
         ingredients: Ingredient
         quantity_type: QuantityType
         info: Info
+        recipeCompositions: RecipeCompositions
+        recipeCategories: RecipeCategories
     }
 
     // Helping types
