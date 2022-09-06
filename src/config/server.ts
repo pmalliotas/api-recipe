@@ -24,7 +24,7 @@ import { userSchemas } from '../routes/user/user.schemas'
 
 // Set up i18next
 i18next.use(i18nextFsBackend).use(i18nextMiddleware.LanguageDetector).init({
-    fallbackLng: 'en',
+    fallbackLng: 'el',
     preload: ['el', 'en'],
     backend: {
         loadPath: './locales/{{lng}}/translation.json',
