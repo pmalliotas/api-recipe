@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { buildJsonSchemas } from "fastify-zod";
+import { z } from "zod"
+import { buildJsonSchemas } from "fastify-zod"
 
 const userCore = {
   email: z
@@ -17,10 +17,9 @@ const userCore = {
     .trim()
     .min(8, 'Ο κωδικός πρέπει να είναι τουλάχιστον 8 χαρακτήρες')
     .regex(new RegExp('^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]'), 'Ο κωδικός πρέπει να περιέχει ένα σύμβολο και ένα κεφαλαίο γράμμα'),
-};
+}
 
-// Create user schema
-const createUser = z.object({
+const registerRequest = z.object({
   ...userCore,
   confirmationPassword: z
     .string({
@@ -32,79 +31,104 @@ const createUser = z.object({
     })
 }).refine(form => form.password === form.confirmationPassword, 'Οι κωδικοί δεν ταιριάζουν')
 
-// Create user response
-const createUserResponse = z.object({
-  id: z.string(),
+const registerResponse = z.object({
   jwt: z.string()
 })
 
-// Login user
+const signInRequest = z.object({ ...userCore })
 
-// Login user response
+const signInResponse = z.object({
+  jwt: z.string()
+})
 
-
-// Update password
-
-// Update password response
-
-
-// Get user data
-
-// Get user data response 
-
-
-// Request reset jwt
-
-// Request reset jwt response
-
-
-// Request reset password token
-
-// Request reset password token response
-
-
-// Reset password 
-
-// Reset password response
-
-
-
-const createUserSchema = z.object({
-  ...userCore,
-  password: z.string({
-    required_error: "Password is required",
-    invalid_type_error: "Password must be a string",
-  }),
-});
-
-const createUserResponseSchema = z.object({
-  ...userCore,
-  id: z.number(),
-  message: z.string(),
-  // created_at: z.date()
-});
-
-const loginSchema = z.object({
-  email: z
+const updatePasswordRequest = z.object({
+  reset_token: z.string(),
+  password: userCore.password,
+  confirmationPassword: z
     .string({
-      required_error: "Email is required",
-      invalid_type_error: "Email must be a string",
-    })
-    .email(),
-  password: z.string(),
-});
+      required_error: 'Η επιβεβαίωση του κωδικού είναι απαραίτητη'
+    }),
+}).refine(form => form.password === form.confirmationPassword, 'Οι κωδικοί δεν ταιριάζουν')
 
-const loginResponseSchema = z.object({
-  accessToken: z.string(),
-});
+const updatePasswordResponse = z.object({
+  jwt: z.string()
+})
 
-export type ICreateUserInput = z.infer<typeof createUserSchema>;
+const getUserDataRequest = z.object({
+  id: z.number()
+})
 
-export type ILoginInput = z.infer<typeof loginSchema>;
+const getUserDataResponse = z.object({
+  username: z.string(),
+  email: userCore.email,
+  image: z.string().optional(),
+  roles: z.string().array()
+})
+
+const updateUserDataResponse = z.object({
+  username: z.string(),
+  image: z.string().optional(),
+})
+
+const resetPasswordTokenRequest = z.object({
+  email: userCore.email
+})
+
+const resetPasswordTokenResponse = z.object({
+
+})
+
+const resetPasswordRequest = z.object({
+  reset_token: z.string(),
+  password: userCore.password,
+  confirmationPassword: z
+    .string({
+      required_error: 'Η επιβεβαίωση του κωδικού είναι απαραίτητη'
+    }),
+}).refine(form => form.password === form.confirmationPassword, 'Οι κωδικοί δεν ταιριάζουν')
+
+const resetPasswordResponse = z.object({
+
+})
+
+export type IRegisterRequest = z.infer<typeof registerRequest>
+
+export type IRegisterResponse = z.infer<typeof registerResponse>
+
+export type ISignInRequest = z.infer<typeof signInRequest>
+
+export type ISignInResponse = z.infer<typeof signInResponse>
+
+export type IUpdatePasswordRequest = z.infer<typeof updatePasswordRequest>
+
+export type IUpdatePasswordResponse = z.infer<typeof updatePasswordResponse>
+
+export type IResetPasswordRequest = z.infer<typeof resetPasswordRequest>
+
+export type IResetPasswordResponse = z.infer<typeof resetPasswordResponse>
+
+export type IResetPasswordTokenRequest = z.infer<typeof resetPasswordTokenRequest>
+
+export type IResetPasswordTokenResponse = z.infer<typeof resetPasswordTokenResponse>
+
+export type IGetUserDataRequest = z.infer<typeof getUserDataRequest>
+
+export type IGetUserDataResponse = z.infer<typeof getUserDataResponse>
+
+export type IUpdateUserDataResponse = z.infer<typeof updateUserDataResponse>
 
 export const { schemas: userSchemas, $ref } = buildJsonSchemas({
-  createUserSchema,
-  createUserResponseSchema,
-  loginSchema,
-  loginResponseSchema,
-});
+  registerRequest,
+  registerResponse,
+  signInRequest,
+  signInResponse,
+  updatePasswordRequest,
+  updatePasswordResponse,
+  resetPasswordRequest,
+  resetPasswordResponse,
+  resetPasswordTokenRequest,
+  resetPasswordTokenResponse,
+  getUserDataRequest,
+  getUserDataResponse,
+  updateUserDataResponse
+})
