@@ -23,17 +23,21 @@ declare module 'fastify' {
     interface FastifyRequest {
         jwt: JWT
         t: (key: keyof typeof lng) => string & TFunction
-    }
-}
-
-declare module "@fastify/jwt" {
-    interface FastifyJWT {
-        user: {
+        user_data: {
             id: number
             email: string
             roles: number[]
             iat: number
         }
+    }
+}
+
+declare module "@fastify/jwt" {
+    interface FastifyJWT {
+        id: number
+        email: string
+        roles: number[]
+        iat: number
     }
 }
 

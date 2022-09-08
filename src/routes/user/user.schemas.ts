@@ -39,7 +39,11 @@ const registerResponse = z.object({
   message: z.string()
 })
 
-const signInRequest = z.object({ ...userCore })
+const signInRequest = z.object({
+  email: userCore.email.optional(),
+  username: userCore.username.optional(),
+  password: userCore.password
+})
 
 const signInResponse = z.object({
   jwt: z.string()

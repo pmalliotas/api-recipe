@@ -1,35 +1,27 @@
+import jwt from 'jsonwebtoken'
+import { DoneFuncWithErrOrRes, FastifyReply, FastifyRequest } from 'fastify'
+import { FastifyJWT } from '@fastify/jwt'
 
-// // import { AuthRequest, JWTPayload } from '../types/types'
-// import jwt, { GetPublicKeyOrSecret, JwtPayload } from 'jsonwebtoken'
+export const isAuth = (req: FastifyRequest, reply: FastifyReply, next: DoneFuncWithErrOrRes) => {
+    const authHeader = req.headers.authorization
+    if (!authHeader) {
+        reply.status(401).send({ message: 'Authorization header not found' })
+    }
+    const token = authHeader?.split(' ')[1]?.toString()
 
-// import { FastifyReply, FastifyRequest } from 'fastify'
+    if (!token) {
+        reply.status(401).send({ message: 'Authentication token not found!' })
+    }
 
-// export const isAuth = (req: FastifyRequest, reply: FastifyReply) => {
-//     try {
-//         const authHeader = req.headers.authorization
-//         if (!authHeader) {
-//             reply.status(401).send({ message: 'Authorization header not found' })
-//         }
-//         const token = authHeader?.split(' ')[1].toString()
+    const decoded = jwt.verify(token as string, process.env.JWT_SECRET as string) as FastifyJWT
 
-//         if (!token) {
-//             reply.status(401).send({ message: 'Unauthenticated. Authentication token not found!' })
-//         }
+    if (Date.now() > decoded.iat * 1000) {
+        reply.status(403).send({ message: 'Auth token expired' })
+    }
 
-//         const decoded = jwt.verify(token as string, process.env.JWT_SECRET_KEY as string) as JwtPayload
-
-//         if (Date.now() < decoded.iat * 1000) {
-//             reply.status(403).send({ message: 'Auth token expired' })
-//         }
-
-//         req.user = decoded
-
-//     } catch (err) {
-//         reply.status(500).send({
-//             message: 'Something went wrong'
-//         })
-//     }
-// }
+    req.user_data = decoded
+    next()
+}
 
 // export const optionalAuth = (req: AuthRequest, res: Response, next: NextFunction) => {
 //     try {

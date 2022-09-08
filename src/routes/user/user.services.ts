@@ -4,9 +4,17 @@ import { db } from "../../config/server"
 
 export const findUserByEmail = async (email: string) => {
     try {
-        const userEmail = await db.selectFrom('users').select('email').where('email', '=', email).execute()
-        console.log(userEmail)
-        return userEmail
+        const user = await db.selectFrom('users').selectAll().where('email', '=', email).executeTakeFirst()
+        return user
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const findUserByEmailorUsername = async (field: string) => {
+    try {
+        const user = await db.selectFrom('users').selectAll().where('email', '=', field).orWhere('username', '=', field).executeTakeFirst()
+        return user
     } catch (error) {
         console.log(error)
     }
@@ -14,8 +22,8 @@ export const findUserByEmail = async (email: string) => {
 
 export const findUserByUsername = async (username: string) => {
     try {
-        const userName = await db.selectFrom('users').select('username').where('username', '=', username).execute()
-        return userName
+        const user = await db.selectFrom('users').selectAll().where('username', '=', username).executeTakeFirst()
+        return user
     } catch (error) {
         console.log(error)
     }
@@ -23,8 +31,8 @@ export const findUserByUsername = async (username: string) => {
 
 export const addUserToDatabase = async (user: Pick<User, 'email' | 'password' | 'username'>) => {
     try {
-        const addedUserId = await db.insertInto('users').values({ ...user }).returning('id').execute()
-        return addedUserId
+        const dbUser = await db.insertInto('users').values({ ...user }).returningAll().executeTakeFirst()
+        return dbUser
     } catch (error) {
         console.log(error)
     }
