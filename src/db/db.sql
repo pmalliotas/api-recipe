@@ -29,10 +29,10 @@ CREATE TABLE IF NOT EXISTS users (
     username varchar(256) UNIQUE NOT NULL,
     email varchar(256) UNIQUE NOT NULL,
     password VARCHAR(256) UNIQUE NOT NULL,
-    image text UNIQUE NOT NULL,
-    roles int[] NOT NULL,
-    reset_token varchar(256) UNIQUE NOT NULL,
-    reset_token_expiration_date varchar(256) UNIQUE NOT NULL,
+    image text UNIQUE,
+    roles int[] DEFAULT '{2022}',
+    reset_token varchar(256) UNIQUE,
+    reset_token_expiration_date varchar(256) UNIQUE,
     created_at timestamptz NOT NULL DEFAULT NOW(),
     updated_at timestamptz
 );

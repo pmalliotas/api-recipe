@@ -9,6 +9,7 @@ const userCore = {
     })
     .trim()
     .email({ message: 'Το πεδίο πρέπει να είναι email' }),
+  username: z.string({ required_error: 'Το username ειναι απαραίτητο' }),
   password: z
     .string({
       required_error: 'Ο κωδικός είναι απαραίτητος',
@@ -21,36 +22,26 @@ const userCore = {
 
 const registerRequest = z.object({
   ...userCore,
-  confirmationPassword: z
+  confirmPassword: z
     .string({
       required_error: 'Η επιβεβαίωση του κωδικού είναι απαραίτητη'
     }),
-  agreement: z
+  aggreement: z
     .boolean({
-      required_error: 'Πρέπει να αποδεχτείτε τους όρους χρήσης για να εγγραφείτε στο ηλεκτρονικό μας κατάστημα',
+      required_error: 'Πρέπει να αποδεχτείτε τους όρους χρήσης για να εγγραφείτε στον ιστότοπό μας',
     })
-}).refine(form => form.password === form.confirmationPassword, 'Οι κωδικοί δεν ταιριάζουν')
+}).refine(data => data.password === data.confirmPassword, {
+  message: 'Οι κωδικοί δεν ταιριάζουν',
+})
 
 const registerResponse = z.object({
-  jwt: z.string()
+  jwt: z.string(),
+  message: z.string()
 })
 
 const signInRequest = z.object({ ...userCore })
 
 const signInResponse = z.object({
-  jwt: z.string()
-})
-
-const updatePasswordRequest = z.object({
-  reset_token: z.string(),
-  password: userCore.password,
-  confirmationPassword: z
-    .string({
-      required_error: 'Η επιβεβαίωση του κωδικού είναι απαραίτητη'
-    }),
-}).refine(form => form.password === form.confirmationPassword, 'Οι κωδικοί δεν ταιριάζουν')
-
-const updatePasswordResponse = z.object({
   jwt: z.string()
 })
 
@@ -66,30 +57,45 @@ const getUserDataResponse = z.object({
 })
 
 const updateUserDataResponse = z.object({
-  username: z.string(),
+  username: z.string().optional(),
   image: z.string().optional(),
+})
+
+// Passwords
+
+const updatePasswordRequest = z.object({
+  password: userCore.password,
+  confirmPassword: z
+    .string({
+      required_error: 'Η επιβεβαίωση του κωδικού είναι απαραίτητη'
+    }),
+}).refine(form => form.password === form.confirmPassword, {
+  message: 'Οι κωδικοί δεν ταιριάζουν',
+  path: ['confirmPassword']
+})
+
+const updatePasswordResponse = z.object({
+  jwt: z.string()
 })
 
 const resetPasswordTokenRequest = z.object({
   email: userCore.email
 })
 
-const resetPasswordTokenResponse = z.object({
-
-})
+const resetPasswordTokenResponse = z.object({})
 
 const resetPasswordRequest = z.object({
-  reset_token: z.string(),
+  reset_token: z.string({
+    required_error: 'Το token είναι απαραίτητο για την επαναφορά του κωδικού'
+  }),
   password: userCore.password,
-  confirmationPassword: z
+  confirmPassword: z
     .string({
       required_error: 'Η επιβεβαίωση του κωδικού είναι απαραίτητη'
     }),
-}).refine(form => form.password === form.confirmationPassword, 'Οι κωδικοί δεν ταιριάζουν')
+}).refine(form => form.password === form.confirmPassword, 'Οι κωδικοί δεν ταιριάζουν')
 
-const resetPasswordResponse = z.object({
-
-})
+const resetPasswordResponse = z.object({})
 
 export type IRegisterRequest = z.infer<typeof registerRequest>
 

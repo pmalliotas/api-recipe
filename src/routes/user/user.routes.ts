@@ -1,26 +1,49 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify"
-import { $ref, ILoginInput } from './user.schemas'
+import { $ref, ISignInRequest, IRegisterRequest } from './user.schemas'
+import { addUserToDatabase, findUserByEmail, findUserByUsername } from "./user.services"
+import bcrypt from 'bcrypt'
 
 const userRoutes = async (server: FastifyInstance) => {
-
-    server.post('/', {
+    server.post('/register', {
         schema: {
-            body: $ref('createUserSchema'),
+            body: $ref('registerRequest'),
             response: {
-                201: $ref('createUserResponseSchema')
+                201: $ref('registerResponse'),
             }
         },
-    }, async (req: FastifyRequest<{ Body: ILoginInput, Querystring: { id: string } }>, reply) => {
+    }, async (req: FastifyRequest<{ Body: IRegisterRequest }>, reply) => {
 
-        const user = await server.knex('users').select('created_at', 'email', 'password', 'id').where('id', 1)
-        console.log(user[0])
+        const { email, username, password, confirmPassword } = req.body
 
-        const comments = await server.knex('comments').innerJoin('users', 'comments.user_id', '=', 'users.id')
-        console.log('🚀 ~ file: user.routes.ts ~ line 19 ~ userRoutes ~ comments', comments[0]);
+        if (password !== confirmPassword) {
+            reply.status(403).send({
+                message: 'Passwords do not match'
+            })
+        }
+
+        const userEmail = await findUserByEmail(email)
+        const userEmailExists = Boolean(userEmail?.length)
+        if (userEmailExists) {
+            reply.status(406).send({
+                message: req.t('user_email_exists')
+            })
+        }
+
+        const userName = await findUserByUsername(username)
+        const userNameExists = Boolean(userName?.length)
+        if (userNameExists) {
+            reply.status(406).send({
+                message: req.t('user_name_exists')
+            })
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+
+        const addedUserId = await addUserToDatabase({ email, username, password: hashedPassword })
 
         reply.status(201).send({
-            ...user[0],
-            message: req.t('user_created')
+            jwt: 'saka',
+            message: req.t('user_name_exists')
         })
     })
 

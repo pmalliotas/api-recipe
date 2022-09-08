@@ -9,12 +9,15 @@ import { withRefResolver } from 'fastify-zod'
 import i18next from 'i18next'
 import i18nextFsBackend from 'i18next-fs-backend'
 import i18nextMiddleware from 'i18next-http-middleware'
-import knex from 'knex'
+import fastifyCors from '@fastify/cors'
+import { Kysely, PostgresDialect } from 'kysely'
+import { Pool } from 'pg'
 
 import { version } from '../../package.json'
+import { Database } from '../db/schemas'
 
 // import configs
-import { helmetConfig, envConfig, rateLimitConfig } from './config'
+import { helmetConfig, envConfig, rateLimitConfig, corsConfig } from './config'
 
 // import routes
 import usersRoutes from '../routes/user/user.routes'
@@ -29,29 +32,36 @@ i18next.use(i18nextFsBackend).use(i18nextMiddleware.LanguageDetector).init({
     backend: {
         loadPath: './locales/{{lng}}/translation.json',
     },
-    keySeparator: false
+    keySeparator: false,
 })
 
 // Start building the server
 const server = fastify()
 
-const buildServer = async () => {
+export const db = new Kysely<Database>({
+    dialect: new PostgresDialect({
+        pool: new Pool({
+            // connectionString: process.env.DB_CONNECTION_URL,
+            host: 'localhost',
+            database: 'recipe_app',
+            user: 'panos',
+            password: 'sakasaka'
+        })
+    })
+})
 
+const buildServer = async () => {
     //Register middlewares
     server.register(fastifyHelmet, helmetConfig)
     server.register(fastifyRateLimit, rateLimitConfig)
+    server.register(fastifyCors, corsConfig)
     server.register(fastifyEnv, envConfig).ready((err => { err && console.log(err) }))
     server.register(i18nextMiddleware.plugin, { i18next })
 
     await server.after()
 
-    const pg = knex({
-        client: 'pg',
-        connection: server.config.DB_CONNECTION_URL
-    })
-
     // server.register(fastifyRedis, { url: server.config.REDIS_CONNECTION_URL })
-    server.decorate('knex', pg)
+    // server.decorate('knex', pg)
     server.register(fastifyJwt, { secret: server.config.JWT_SECRET })
 
     for (const schema of [...userSchemas]) {
