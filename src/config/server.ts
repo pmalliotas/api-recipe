@@ -5,10 +5,14 @@ import fastifyJwt from '@fastify/jwt'
 import fastifyEnv from '@fastify/env'
 import fastifyRedis from '@fastify/redis'
 import fastifySwagger from '@fastify/swagger'
+import fastifyStatic from '@fastify/static'
 import { withRefResolver } from 'fastify-zod'
 import i18next from 'i18next'
 import i18nextFsBackend from 'i18next-fs-backend'
 import i18nextMiddleware from 'i18next-http-middleware'
+
+import multer from 'fastify-multer'
+
 import fastifyCors from '@fastify/cors'
 import { Kysely, PostgresDialect } from 'kysely'
 import { Pool } from 'pg'
@@ -24,6 +28,7 @@ import usersRoutes from '../routes/user/user.routes'
 
 // import schemas
 import { userSchemas } from '../routes/user/user.schemas'
+import path from 'path'
 
 // Set up i18next
 i18next.use(i18nextFsBackend).use(i18nextMiddleware.LanguageDetector).init({
@@ -56,12 +61,18 @@ const buildServer = async () => {
     server.register(fastifyRateLimit, rateLimitConfig)
     server.register(fastifyCors, corsConfig)
     server.register(fastifyEnv, envConfig).ready((err => { err && console.log(err) }))
-    server.register(i18nextMiddleware.plugin, { i18next })
+    // server.register(i18nextMiddleware.plugin, { i18next })
 
     await server.after()
 
+    server.register(multer.contentParser)
+
+    server.register(fastifyStatic, {
+        root: path.join(path.resolve(), 'public'),
+        prefix: '/public/',
+    })
+
     // server.register(fastifyRedis, { url: server.config.REDIS_CONNECTION_URL })
-    // server.decorate('knex', pg)
     server.register(fastifyJwt, { secret: server.config.JWT_SECRET })
 
     for (const schema of [...userSchemas]) {

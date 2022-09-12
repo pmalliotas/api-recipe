@@ -5,9 +5,11 @@ import { FastifyCorsOptions } from '@fastify/cors'
 import { JWT } from "@fastify/jwt"
 import path from "path"
 import { TFunction } from "i18next"
+import multer from 'fastify-multer'
 
 // import lng from '../../locales/el/translation.json'
 import lng from '../../locales/el/temp_translation'
+import { IFileType } from '../types/general'
 
 declare module 'fastify' {
     interface FastifyInstance {
@@ -29,6 +31,7 @@ declare module 'fastify' {
             roles: number[]
             iat: number
         }
+        file?: IFileType
     }
 }
 
@@ -54,6 +57,21 @@ export const corsConfig: FastifyCorsOptions = {
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type'],
 }
+
+const upload = multer({
+    limits: {
+        fileSize: 192000,
+    },
+    fileFilter: (req, file, cb) => {
+        if (!(file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/webp')) {
+            return cb(new Error(`${file.originalname}'s filetype is not allowed`));
+        }
+        cb(null, true);
+    },
+})
+
+export const uploadSingleFile = upload.single('image')
+export const uploadMultipleFiles = upload.array('images', 10)
 
 export const envConfig: fastifyEnvOpt = {
     dotenv: {
