@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest, preHandlerHookHandler } from "fastify"
 import { $ref } from './user.schemas'
 import { isAuth } from '../../middlewares/auth'
-import { onRegister, onSignIn, onUpload } from './user.controller'
+import { onRegister, onSignIn, onUploadImage } from './user.controller'
 import { uploadSingleFile } from '../../config/config'
 
 const userRoutes = async (server: FastifyInstance) => {
@@ -24,9 +24,9 @@ const userRoutes = async (server: FastifyInstance) => {
     }, onSignIn(server))
 
     server.post('/upload-image', {
-        preHandler: uploadSingleFile
+        preHandler: [isAuth, uploadSingleFile]
     },
-        onUpload(server)
+        onUploadImage(server)
     )
 
     server.get('/test', {

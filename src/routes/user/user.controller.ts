@@ -2,8 +2,10 @@ import bcrypt from 'bcrypt'
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify"
 
 import { IRegisterRequest, ISignInRequest } from "./user.schemas"
-import { addUserToDatabase, findUserByEmail, findUserByEmailorUsername, findUserByUsername } from "./user.services"
+import { addUserToDatabase, findUserByEmail, findUserByEmailorUsername, findUserById, findUserByUsername, updateUserImage } from "./user.services"
 
+import { getUsersFilePath, removeFile, uploadImage } from '../../lib/file.utils'
+import path from 'path'
 
 export const onRegister = (server: FastifyInstance) => async (req: FastifyRequest<{ Body: IRegisterRequest }>, reply: FastifyReply) => {
     const { email, username, password, confirmPassword } = req.body
@@ -84,7 +86,16 @@ export const onSignIn = (server: FastifyInstance) => async (req: FastifyRequest<
     })
 }
 
-export const onUpload = (server: FastifyInstance) => async (req: FastifyRequest, reply: FastifyReply) => {
-    console.log(req.file)
-    reply.status(201).send({ message: 'It\'s ok' })
+export const onUploadImage = (server: FastifyInstance) => async (req: FastifyRequest, reply: FastifyReply) => {
+    const user = await findUserById(req.user_data.id)
+
+    if (user) {
+        removeFile(path.join(getUsersFilePath(), user.image as string))
+    }
+
+    const fileName = uploadImage(getUsersFilePath(), req.file)
+
+    await updateUserImage(req.user_data.id, fileName as string)
+
+    reply.status(201).send({ message: 'File uploaded successfully' })
 }

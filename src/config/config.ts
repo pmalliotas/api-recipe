@@ -31,7 +31,7 @@ declare module 'fastify' {
             roles: number[]
             iat: number
         }
-        file?: IFileType
+        file: IFileType
     }
 }
 

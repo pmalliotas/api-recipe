@@ -3,6 +3,7 @@ import fastifyHelmet from '@fastify/helmet'
 import fastifyRateLimit from '@fastify/rate-limit'
 import fastifyJwt from '@fastify/jwt'
 import fastifyEnv from '@fastify/env'
+import fastifyMulter from 'fastify-multer'
 import fastifyRedis from '@fastify/redis'
 import fastifySwagger from '@fastify/swagger'
 import fastifyStatic from '@fastify/static'
@@ -10,8 +11,6 @@ import { withRefResolver } from 'fastify-zod'
 import i18next from 'i18next'
 import i18nextFsBackend from 'i18next-fs-backend'
 import i18nextMiddleware from 'i18next-http-middleware'
-
-import multer from 'fastify-multer'
 
 import fastifyCors from '@fastify/cors'
 import { Kysely, PostgresDialect } from 'kysely'
@@ -62,10 +61,9 @@ const buildServer = async () => {
     server.register(fastifyCors, corsConfig)
     server.register(fastifyEnv, envConfig).ready((err => { err && console.log(err) }))
     // server.register(i18nextMiddleware.plugin, { i18next })
+    server.register(fastifyMulter.contentParser)
 
     await server.after()
-
-    server.register(multer.contentParser)
 
     server.register(fastifyStatic, {
         root: path.join(path.resolve(), 'public'),

@@ -23,61 +23,29 @@ export const isAuth = (req: FastifyRequest, reply: FastifyReply, next: DoneFuncW
     next()
 }
 
-// export const optionalAuth = (req: AuthRequest, res: Response, next: NextFunction) => {
-//     try {
-//         const authHeader = req.headers?.authorization
-//         if (!authHeader) {
-//             return next()
-//         }
+export const isAdmin = (req: FastifyRequest, reply: FastifyReply, next: DoneFuncWithErrOrRes) => {
+    const authHeader = req.headers.authorization
+    if (!authHeader) {
+        reply.status(401).send({ message: 'Authorization header not found' })
+    }
+    const token = authHeader?.split(' ')[1]?.toString()
 
-//         const token = authHeader.split(' ')[1].toString()
+    if (!token) {
+        reply.status(401).send({ message: 'Authentication token not found!' })
+    }
 
-//         if (!token) {
-//             return next()
-//         }
+    const decoded = jwt.verify(token as string, process.env.JWT_SECRET as string) as FastifyJWT
 
-//         const decoded = <JWTPayload>jwt.verify(token, process.env.JWT_SECRET_KEY)
+    if (Date.now() > decoded.iat * 1000) {
+        reply.status(403).send({ message: 'Auth token expired' })
+    }
 
-//         if (Date.now() < decoded.iat * 1000) {
-//             throw customError(403, 'Auth token expired')
-//         }
+    if (!decoded.roles.includes(5150)) {
+        reply.status(401).send({
+            message: 'User is not administrator'
+        })
+    }
 
-//         req.userData = decoded
-//         next()
-//     } catch (err) {
-//         next()
-//     }
-// }
-
-// export const isAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
-//     try {
-//         const authHeader = req.headers.authorization
-
-//         if (!authHeader) {
-//             throw customError(401, 'Authorization header not found')
-//         }
-//         const token = authHeader.split(' ')[1].toString()
-
-//         if (!token) {
-//             throw customError(401, 'Authorization token not found')
-//         }
-
-//         const decoded = <JWTPayload>jwt.verify(token, process.env.JWT_SECRET_KEY)
-
-//         if (Date.now() < decoded.iat * 1000) {
-//             throw customError(403, 'Auth token expired')
-//         }
-
-//         req.userData = decoded
-
-//         const userDoc = await User.findOne({ _id: decoded.userId, roles: { $in: 5150 } })
-
-//         if (!userDoc) {
-//             throw customError(401, 'User does not have administrative priviledges')
-//         }
-
-//         next()
-//     } catch (err) {
-//         next(err)
-//     }
-// }
+    req.user_data = decoded
+    next()
+}
