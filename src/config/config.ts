@@ -8,7 +8,6 @@ import { TFunction } from "i18next"
 import multer from 'fastify-multer'
 
 // import lng from '../../locales/el/translation.json'
-import lng from '../../locales/el/temp_translation'
 import { IFileType } from '../types/general'
 
 declare module 'fastify' {
@@ -24,7 +23,6 @@ declare module 'fastify' {
 
     interface FastifyRequest {
         jwt: JWT
-        t: (key: keyof typeof lng) => string & TFunction
         user_data: {
             id: number
             email: string

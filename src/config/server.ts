@@ -8,9 +8,6 @@ import fastifyRedis from '@fastify/redis'
 import fastifySwagger from '@fastify/swagger'
 import fastifyStatic from '@fastify/static'
 import { withRefResolver } from 'fastify-zod'
-import i18next from 'i18next'
-import i18nextFsBackend from 'i18next-fs-backend'
-import i18nextMiddleware from 'i18next-http-middleware'
 
 import fastifyCors from '@fastify/cors'
 import { Kysely, PostgresDialect } from 'kysely'
@@ -28,16 +25,6 @@ import usersRoutes from '../routes/user/user.routes'
 // import schemas
 import { userSchemas } from '../routes/user/user.schemas'
 import path from 'path'
-
-// Set up i18next
-i18next.use(i18nextFsBackend).use(i18nextMiddleware.LanguageDetector).init({
-    fallbackLng: 'el',
-    preload: ['el', 'en'],
-    backend: {
-        loadPath: './locales/{{lng}}/translation.json',
-    },
-    keySeparator: false,
-})
 
 // Start building the server
 const server = fastify()
@@ -60,7 +47,6 @@ const buildServer = async () => {
     server.register(fastifyRateLimit, rateLimitConfig)
     server.register(fastifyCors, corsConfig)
     server.register(fastifyEnv, envConfig).ready((err => { err && console.log(err) }))
-    // server.register(i18nextMiddleware.plugin, { i18next })
     server.register(fastifyMulter.contentParser)
 
     await server.after()

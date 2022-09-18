@@ -49,20 +49,19 @@ const signInResponse = z.object({
   jwt: z.string()
 })
 
-const getUserDataRequest = z.object({
-  id: z.number()
-})
+// const getUserDataRequest = z.object({
+//   id: z.number()
+// })
 
 const getUserDataResponse = z.object({
   username: z.string(),
   email: userCore.email,
-  image: z.string().optional(),
+  image: z.string(),
   roles: z.string().array()
 })
 
 const updateUserDataResponse = z.object({
   username: z.string().optional(),
-  image: z.string().optional(),
 })
 
 // Passwords
@@ -79,7 +78,8 @@ const updatePasswordRequest = z.object({
 })
 
 const updatePasswordResponse = z.object({
-  jwt: z.string()
+  jwt: z.string(),
+  message: z.string()
 })
 
 const resetPasswordTokenRequest = z.object({
@@ -121,7 +121,7 @@ export type IResetPasswordTokenRequest = z.infer<typeof resetPasswordTokenReques
 
 export type IResetPasswordTokenResponse = z.infer<typeof resetPasswordTokenResponse>
 
-export type IGetUserDataRequest = z.infer<typeof getUserDataRequest>
+// export type IGetUserDataRequest = z.infer<typeof getUserDataRequest>
 
 export type IGetUserDataResponse = z.infer<typeof getUserDataResponse>
 
@@ -138,7 +138,7 @@ export const { schemas: userSchemas, $ref } = buildJsonSchemas({
   resetPasswordResponse,
   resetPasswordTokenRequest,
   resetPasswordTokenResponse,
-  getUserDataRequest,
+  // getUserDataRequest,
   getUserDataResponse,
   updateUserDataResponse
 })

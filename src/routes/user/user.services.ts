@@ -47,6 +47,15 @@ export const addUserToDatabase = async (user: Pick<User, 'email' | 'password' | 
     }
 }
 
+export const updateUserPassword = async (userId: number, password: string) => {
+    try {
+        const dbUser = await db.updateTable('users').set({ password }).where('id', '=', userId).returningAll().executeTakeFirst()
+        return dbUser
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 export const updateUserImage = async (userId: number, imageUrl: string) => {
     try {
         const dbUser = await db.updateTable('users').set({ image: imageUrl }).where('id', '=', userId).returning('image').execute()
